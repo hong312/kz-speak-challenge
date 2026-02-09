@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KZ x Speak Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background: #ffffff;
+            color: #1d1d1f;
+            line-height: 1.47059;
+            font-weight: 400;
+            letter-spacing: -0.022em;
+        }
+        
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+        
+        /* 로딩 화면 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #1271BB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            color: #6e6e73;
+            font-size: 16px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 52px 0 40px;
+        }
+        
+        .header h1 {
+            font-size: 64px;
+            line-height: 1.05;
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+        
+        .header .subtitle {
+            font-size: 32px;
+            line-height: 1.125;
+            font-weight: 600;
+            letter-spacing: 0em;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+        }
+        
+        .header .highlight {
+            color: #1271BB;
+            font-weight: 700;
+        }
+        
+        .header .detail {
+            font-size: 19px;
+            line-height: 1.42105;
+            font-weight: 500;
+            letter-spacing: -0.022em;
+            color: #6e6e73;
+            margin-top: 8px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 32px 0 60px;
+        }
+        
+        .stat-card {
+            background: #fbfbfd;
+            border-radius: 18px;
+            padding: 26px 20px;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            background: #f5f5f7;
+        }
+        
+        .stat-card .label {
+            font-size: 12px;
+            line-height: 1.33337;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            color: #6e6e73;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        
+        .stat-card .value {
+            font-size: 40px;
+            line-height: 1.08349;
+            font-weight: 600;
+            letter-spacing: 0em;
+            color: #1d1d1f;
+            margin-bottom: 2px;
+        }
+        
+        .stat-card .subtext {
+            font-size: 14px;
+            line-height: 1.42859;
+            font-weight: 400;
+            letter-spacing: -0.016em;
+            color: #86868b;
+        }
+        
+        .section {
+            margin-bottom: 60px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            line-height: 1.125;
+            font-weight: 600;
+            letter-spacing: 0.004em;
+            color: #1d1d1f;
+        }
+        
+        .search-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .search-box {
+            width: 240px;
+            padding: 8px 36px 8px 14px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #1d1d1f;
+            transition: all 0.2s ease;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #1d1d1f;
+            box-shadow: 0 0 0 3px rgba(29, 29, 31, 0.1);
+        }
+        
+        .search-box::placeholder {
+            color: #86868b;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #86868b;
+            pointer-events: none;
+        }
+        
+        .clear-search {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #86868b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .clear-search.visible {
+            display: flex;
+        }
+        
+        .my-rank-highlight {
+            background: #fff9e6 !important;
+            border-left: 3px solid #f5a623 !important;
+        }
+        
+        .my-rank-highlight:hover {
+            background: #fff5d6 !important;
+        }
+        
+        .show-all-btn {
+            margin: 20px auto;
+            display: block;
+            padding: 10px 24px;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .show-all-btn:hover {
+            background: #e8e8ed;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            background: #f5f5f7;
+            padding: 4px;
+            border-radius: 10px;
+        }
+        
+        .tab {
+            padding: 6px 14px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 400;
+            color: #6e6e73;
+            transition: all 0.15s ease;
+        }
+        
+        .tab.active {
+            background: #ffffff;
+            color: #1d1d1f;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            margin-bottom: 1px;
+            background: #fbfbfd;
+            transition: all 0.2s ease;
+        }
+        
+        .leaderboard-item:first-child {
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .leaderboard-item:last-child {
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .leaderboard-item:only-child {
+            border-radius: 12px;
+        }
+        
+        .leaderboard-item:hover {
+            background: #f5f5f7;
+            padding-left: 24px;
+        }
+        
+        .rank {
+            font-size: 17px;
+            line-height: 1.47059;
+            font-weight: 600;
+            color: #86868b;
+            min-width: 36px;
+            text-align: center;
+        }
+        
+        .rank.gold { color: #f5a623; }
+        .rank.silver { color: #9b9b9b; }
+        .rank.bronze { color: #cd7f32; }
+        
+        .participant-info {
+            flex-grow: 1;
+            margin-left: 16px;
+        }
+        
+        .participant-name {
+            font-size: 17px;
+            line-height: 1.47059;
+            font-weight: 500;
+            color: #1d1d1f;
+            margin-bottom: 3px;
+        }
+        
+        .participant-dept {
+            font-size: 14px;
+            line-height: 1.42859;
+            font-weight: 400;
+            color: #6e6e73;
+        }
+        
+        .score {
+            font-size: 21px;
+            line-height: 1.19048;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-left: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .score-value {
+            font-size: 24px;
+            line-height: 1;
+        }
+        
+        .score-label {
+            font-size: 11px;
+            color: #86868b;
+            font-weight: 400;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        
+        .progress-bar {
+            height: 3px;
+            background: #e8e8ed;
+            border-radius: 1.5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #1d1d1f;
+            border-radius: 1.5px;
+            transition: width 1.2s cubic-bezier(0.28, 0.11, 0.32, 1);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 6px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        
+        .badge.completed {
+            background: #d1f4e0;
+            color: #007a3d;
+        }
+        
+        .badge.hot {
+            background: #ffe9d6;
+            color: #bf5000;
+        }
+        
+        .rank-change {
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        
+        .sidebar-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 60px;
+        }
+        
+        .sidebar-title {
+            font-size: 24px;
+            line-height: 1.16667;
+            font-weight: 600;
+            letter-spacing: 0.009em;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+        }
+        
+        .milestone-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        
+        .milestone-item:last-child {
+            border-bottom: none;
+        }
+        
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .milestone-name {
+            font-size: 17px;
+            line-height: 1.47059;
+            font-weight: 400;
+            color: #1d1d1f;
+        }
+        
+        .milestone-count {
+            font-size: 17px;
+            line-height: 1.47059;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        
+        .milestone-bar {
+            height: 3px;
+            background: #e8e8ed;
+            border-radius: 1.5px;
+            overflow: hidden;
+        }
+        
+        .milestone-fill {
+            height: 100%;
+            background: #1d1d1f;
+            border-radius: 1.5px;
+            transition: width 1s cubic-bezier(0.28, 0.11, 0.32, 1);
+        }
+        
+        .dept-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        
+        .dept-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dept-rank {
+            font-size: 14px;
+            font-weight: 600;
+            color: #86868b;
+            min-width: 22px;
+        }
+        
+        .dept-name {
+            flex-grow: 1;
+            font-size: 14px;
+            line-height: 1.42859;
+            font-weight: 400;
+            color: #1d1d1f;
+            margin-left: 10px;
+        }
+        
+        .dept-score {
+            font-size: 14px;
+            line-height: 1.42859;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .leaderboard-item {
+            animation: fadeIn 0.4s ease-out backwards;
+        }
+        
+        .leaderboard-item:nth-child(1) { animation-delay: 0s; }
+        .leaderboard-item:nth-child(2) { animation-delay: 0.03s; }
+        .leaderboard-item:nth-child(3) { animation-delay: 0.06s; }
+        .leaderboard-item:nth-child(4) { animation-delay: 0.09s; }
+        .leaderboard-item:nth-child(5) { animation-delay: 0.12s; }
+        .leaderboard-item:nth-child(6) { animation-delay: 0.15s; }
+        .leaderboard-item:nth-child(7) { animation-delay: 0.18s; }
+        .leaderboard-item:nth-child(8) { animation-delay: 0.21s; }
+        .leaderboard-item:nth-child(9) { animation-delay: 0.24s; }
+        .leaderboard-item:nth-child(10) { animation-delay: 0.27s; }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 48px; }
+            .header .subtitle { font-size: 24px; }
+            .header .detail { font-size: 17px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .sidebar-grid { grid-template-columns: 1fr; gap: 40px; }
+            .section-header { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 12px; 
+            }
+            .section-header > div:last-child {
+                width: 100%;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .tabs {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 로딩 화면 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">구글 시트에서 데이터를 불러오는 중...</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>KZ x Speak Challenge</h1>
+            <div class="subtitle"><span class="highlight">수료율 100%</span> 모두 함께 완주하는 스픽 챌린지!</div>
+            <div class="detail">2026.01.08 ~ 2026.03.25 · 1,800문장 이상 수료</div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Completed</div>
+                <div class="value" id="completedCount">0</div>
+                <div class="subtext"><span id="totalPeople">70</span>명 중</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Rate</div>
+                <div class="value" id="completionRate">0%</div>
+                <div class="subtext">수료율</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Progress</div>
+                <div class="value" id="avgProgress">0%</div>
+                <div class="subtext">평균 진행률</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">D-Day</div>
+                <div class="value" id="dday">0</div>
+                <div class="subtext" id="endDate">2026.03.25</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Leaderboard</div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="search-container">
+                        <input 
+                            type="text" 
+                            class="search-box" 
+                            id="searchBox" 
+                            placeholder="사번 검색"
+                            onkeyup="searchPerson()"
+                        >
+                        <span class="search-icon">🔍</span>
+                        <button class="clear-search" id="clearSearch" onclick="clearSearch()">×</button>
+                    </div>
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('individual')">개인</button>
+                        <button class="tab" onclick="showTab('department')">부서</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="individual" class="tab-content active">
+                <div id="leaderboard"></div>
+                <button class="show-all-btn" id="showAllBtn" onclick="toggleShowAll()">전체 순위 보기</button>
+            </div>
+            
+            <div id="department" class="tab-content">
+                <div id="deptLeaderboard"></div>
+            </div>
+        </div>
+        
+        <div class="sidebar-grid">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Milestones</div>
+                <div id="milestones"></div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Top Departments</div>
+                <div id="topDepts"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const COMPLETION_CRITERIA = { minSentences: 1800 };
+        const CHALLENGE_END = new Date('2026-03-25');
+        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSP1ZVKR-uPdSqufvK-bBIJ8qJb5HoNAhorKWeJhld77hTMrxGJ4uh0Q9Mt6Ni81UMmlzfyqmei6fws/pub?output=csv';
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        
+        let data = [];
+        let showingAll = false;
+        let allParticipants = [];
+        let previousRankings = {};
+        
+        // CSV 파싱 함수
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const result = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const values = line.split(',');
+                if (values.length >= 5) {
+                    result.push({
+                        id: values[0].trim(),
+                        name: values[1].trim(),
+                        dept: values[2].trim(),
+                        days: parseInt(values[3]) || 0,
+                        sentences: parseInt(values[4]) || 0
+                    });
+                }
+            }
+            
+            // 문장수로 정렬
+            result.sort((a, b) => b.sentences - a.sentences);
+            
+            return result;
+        }
+        
+        // 구글 시트에서 데이터 로드
+        async function loadDataFromGoogleSheets() {
+            try {
+                const url = CORS_PROXY + encodeURIComponent(GOOGLE_SHEET_URL);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('데이터를 불러올 수 없습니다.');
+                }
+                const csvText = await response.text();
+                return parseCSV(csvText);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해주세요.');
+                return [];
+            }
+        }
+        
+        function generateRandomPreviousRankings() {
+            const rankings = {};
+            data.forEach((person, index) => {
+                const currentRank = index + 1;
+                const randomChange = Math.floor(Math.random() * 11) - 5;
+                const previousRank = Math.max(1, Math.min(data.length, currentRank + randomChange));
+                rankings[person.id] = previousRank;
+            });
+            return rankings;
+        }
+        
+        function maskName(name) {
+            if (!name || name.length === 0) return '***';
+            if (name.length === 1) return name + '**';
+            if (name.length === 2) return name[0] + '**';
+            return name[0] + '*'.repeat(name.length - 1);
+        }
+        
+        function calculateDday() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const endDate = new Date(CHALLENGE_END);
+            endDate.setHours(0, 0, 0, 0);
+            const diff = endDate - today;
+            return Math.ceil(diff / (1000 * 60 * 60 * 24));
+        }
+        
+        function formatEndDate() {
+            const year = CHALLENGE_END.getFullYear();
+            const month = String(CHALLENGE_END.getMonth() + 1).padStart(2, '0');
+            const day = String(CHALLENGE_END.getDate()).padStart(2, '0');
+            return `${year}.${month}.${day}`;
+        }
+        
+        function isCompleted(person) {
+            return person.sentences >= COMPLETION_CRITERIA.minSentences;
+        }
+        
+        function calculateProgress(person) {
+            return Math.min(Math.round((person.sentences / COMPLETION_CRITERIA.minSentences) * 100), 100);
+        }
+        
+        function getRankChange(currentRank, employeeId) {
+            const prevRank = previousRankings[employeeId];
+            if (!prevRank) return { change: 0, badge: '' };
+            const diff = prevRank - currentRank;
+            if (diff > 0) return { change: diff, badge: `<span class="rank-change" style="color: #1E973A;">↑${diff}</span>` };
+            if (diff < 0) return { change: diff, badge: `<span class="rank-change" style="color: #e67e22;">↓${Math.abs(diff)}</span>` };
+            return { change: 0, badge: '<span class="rank-change" style="color: #d2d2d7;">−</span>' };
+        }
+        
+        function calculateStats() {
+            const participants = data;
+            const completed = data.filter(p => isCompleted(p));
+            let totalProgress = 0;
+            participants.forEach(p => totalProgress += calculateProgress(p));
+            const avgProgress = participants.length > 0 ? Math.round(totalProgress / participants.length) : 0;
+            return {
+                totalPeople: data.length,
+                completedCount: completed.length,
+                completionRate: Math.round((completed.length / data.length) * 100),
+                avgProgress,
+                dday: calculateDday()
+            };
+        }
+        
+        function animateValue(elementId, value, suffix = '') {
+            const element = document.getElementById(elementId);
+            const duration = 1500;
+            const steps = 50;
+            const increment = value / steps;
+            let current = 0;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= value) {
+                    current = value;
+                    clearInterval(timer);
+                }
+                if (suffix === '%') {
+                    element.textContent = Math.round(current) + suffix;
+                } else {
+                    element.textContent = Math.round(current).toLocaleString() + suffix;
+                }
+            }, duration / steps);
+        }
+        
+        function renderLeaderboard(searchTerm = '') {
+            const leaderboardDiv = document.getElementById('leaderboard');
+            allParticipants = data;
+            
+            let displayParticipants = allParticipants;
+            
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                displayParticipants = allParticipants.filter(p => 
+                    p.id.toLowerCase().includes(term)
+                );
+            } else if (!showingAll) {
+                displayParticipants = allParticipants.slice(0, 20);
+            }
+            
+            const maxSentences = allParticipants.filter(p => p.sentences > 0)[0]?.sentences || 1;
+            
+            if (displayParticipants.length === 0) {
+                leaderboardDiv.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #86868b;">
+                        검색 결과가 없습니다.
+                    </div>
+                `;
+                document.getElementById('showAllBtn').style.display = 'none';
+                return;
+            }
+            
+            leaderboardDiv.innerHTML = displayParticipants.map((person, index) => {
+                const actualRank = allParticipants.findIndex(p => p.id === person.id) + 1;
+                const rank = actualRank;
+                
+                let rankClass = '';
+                let medal = '';
+                if (rank === 1) { rankClass = 'gold'; medal = '🥇'; }
+                else if (rank === 2) { rankClass = 'silver'; medal = '🥈'; }
+                else if (rank === 3) { rankClass = 'bronze'; medal = '🥉'; }
+                
+                const progressPercent = (person.sentences / maxSentences) * 100;
+                const personalProgress = calculateProgress(person);
+                const completed = isCompleted(person);
+                const rankChange = getRankChange(rank, person.id);
+                const maskedName = maskName(person.name);
+                
+                let badges = '';
+                if (completed) badges += '<span class="badge completed">수료</span>';
+                else if (person.days >= 20) badges += '<span class="badge hot">열정</span>';
+                
+                const isSearchResult = searchTerm && 
+                    person.id.toLowerCase().includes(searchTerm.toLowerCase());
+                const highlightClass = isSearchResult ? 'my-rank-highlight' : '';
+                
+                return `
+                    <div class="leaderboard-item ${highlightClass}" id="rank-${person.id}">
+                        <div class="rank ${rankClass}">${medal || rank}</div>
+                        <div class="participant-info">
+                            <div class="participant-name">
+                                ${person.id} (${maskedName})
+                                ${rankChange.badge}
+                                ${badges}
+                            </div>
+                            <div class="participant-dept">${person.dept} · 학습일수 ${person.days}일 · ${personalProgress}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                            </div>
+                        </div>
+                        <div class="score">
+                            <div class="score-value">${person.sentences.toLocaleString()}</div>
+                            <div class="score-label">말한 문장수</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const showAllBtn = document.getElementById('showAllBtn');
+            if (searchTerm || allParticipants.length <= 20) {
+                showAllBtn.style.display = 'none';
+            } else {
+                showAllBtn.style.display = 'block';
+                showAllBtn.textContent = showingAll ? '상위 20명만 보기' : `전체 순위 보기 (${allParticipants.length}명)`;
+            }
+        }
+        
+        function toggleShowAll() {
+            showingAll = !showingAll;
+            renderLeaderboard();
+            
+            if (showingAll) {
+                document.querySelector('.section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function searchPerson() {
+            const searchBox = document.getElementById('searchBox');
+            const clearBtn = document.getElementById('clearSearch');
+            const searchTerm = searchBox.value.trim();
+            
+            if (searchTerm) {
+                clearBtn.classList.add('visible');
+                showingAll = true;
+            } else {
+                clearBtn.classList.remove('visible');
+            }
+            
+            renderLeaderboard(searchTerm);
+            
+            if (searchTerm) {
+                setTimeout(() => {
+                    const highlighted = document.querySelector('.my-rank-highlight');
+                    if (highlighted) {
+                        highlighted.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchBox').value = '';
+            document.getElementById('clearSearch').classList.remove('visible');
+            showingAll = false;
+            renderLeaderboard();
+        }
+        
+        function renderDepartmentLeaderboard() {
+            const deptStats = {};
+            data.forEach(person => {
+                if (!deptStats[person.dept]) deptStats[person.dept] = { total: 0, count: 0 };
+                deptStats[person.dept].total += person.sentences;
+                deptStats[person.dept].count += 1;
+            });
+            
+            const deptArray = Object.entries(deptStats)
+                .map(([dept, stats]) => ({ dept, avg: Math.round(stats.total / stats.count), count: stats.count }))
+                .sort((a, b) => b.avg - a.avg)
+                .slice(0, 20);
+            
+            const deptDiv = document.getElementById('deptLeaderboard');
+            deptDiv.innerHTML = deptArray.map((dept, index) => `
+                <div class="leaderboard-item">
+                    <div class="rank">${index + 1}</div>
+                    <div class="participant-info">
+                        <div class="participant-name">${dept.dept}</div>
+                        <div class="participant-dept">${dept.count}명 참여</div>
+                    </div>
+                    <div class="score">
+                        <div class="score-value">${dept.avg.toLocaleString()}</div>
+                        <div class="score-label">평균 문장수</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderMilestones() {
+            const milestones = [
+                { name: '수료 달성', threshold: 1800, emoji: '🎓' },
+                { name: '거의 다 왔어요', threshold: 1500, emoji: '🔥' },
+                { name: '절반 통과', threshold: 900, emoji: '💪' },
+                { name: '시작', threshold: 100, emoji: '🌱' }
+            ];
+            
+            const milestonesDiv = document.getElementById('milestones');
+            milestonesDiv.innerHTML = milestones.map(milestone => {
+                const count = data.filter(p => p.sentences >= milestone.threshold).length;
+                const percentage = (count / data.length) * 100;
+                return `
+                    <div class="milestone-item">
+                        <div class="milestone-header">
+                            <div class="milestone-name">${milestone.emoji} ${milestone.name}</div>
+                            <div class="milestone-count">${count}명</div>
+                        </div>
+                        <div class="milestone-bar">
+                            <div class="milestone-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderTopDepts() {
+            const deptStats = {};
+            data.forEach(person => {
+                if (!deptStats[person.dept]) deptStats[person.dept] = { total: 0, count: 0 };
+                deptStats[person.dept].total += person.sentences;
+                deptStats[person.dept].count += 1;
+            });
+            
+            const topDepts = Object.entries(deptStats)
+                .map(([dept, stats]) => ({ dept, avg: Math.round(stats.total / stats.count) }))
+                .sort((a, b) => b.avg - a.avg)
+                .slice(0, 8);
+            
+            const topDeptsDiv = document.getElementById('topDepts');
+            topDeptsDiv.innerHTML = topDepts.map((dept, index) => `
+                <div class="dept-item">
+                    <div class="dept-rank">${index + 1}</div>
+                    <div class="dept-name">${dept.dept}</div>
+                    <div class="dept-score">${dept.avg.toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+        
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        // 초기화 함수
+        async function initialize() {
+            // 로딩 화면 표시
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            
+            // 구글 시트에서 데이터 로드
+            data = await loadDataFromGoogleSheets();
+            
+            if (data.length === 0) {
+                document.getElementById('loadingOverlay').innerHTML = `
+                    <div style="text-align: center;">
+                        <h2 style="color: #1d1d1f; margin-bottom: 16px;">데이터를 불러올 수 없습니다</h2>
+                        <p style="color: #6e6e73;">페이지를 새로고침해주세요</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 랜덤 순위 변화 생성
+            previousRankings = generateRandomPreviousRankings();
+            
+            // 통계 계산 및 렌더링
+            const stats = calculateStats();
+            document.getElementById('totalPeople').textContent = stats.totalPeople;
+            document.getElementById('endDate').textContent = formatEndDate();
+            animateValue('completedCount', stats.completedCount);
+            animateValue('completionRate', stats.completionRate, '%');
+            animateValue('avgProgress', stats.avgProgress, '%');
+            animateValue('dday', stats.dday);
+            
+            renderLeaderboard();
+            renderDepartmentLeaderboard();
+            renderMilestones();
+            renderTopDepts();
+            
+            // 로딩 화면 숨기기
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 500);
+        }
+        
+        // 페이지 로드 시 초기화
+        window.onload = initialize;
+    </script>
+</body>
+</html>
